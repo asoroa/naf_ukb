@@ -1,0 +1,46 @@
+2009-06-16  Aitor Soroa <a.soroa@gmail.com>
+
+	* Readme.txt: Update documentation
+
+2009-06-16  Aitor Soroa <a.soroa@gmail.com>
+
+	* kaf_annotate_senses.pl: Use better error handling when calling wsd
+	tool
+
+2009-06-16  Aitor Soroa <a.soroa@gmail.com>
+
+	* kaf_annotate_senses.pl: Use 'ukb_wsd' app instead of 'wsd_kyoto'.
+	Also, use --allranks option by default.
+
+2009-06-10  Aitor Soroa <a.soroa@gmail.com>
+
+	* kaf_annotate_senses.pl: Add default posmap for KAF
+
+2009-03-04  Aitor Soroa <a.soroa@gmail.com>
+
+	* kaf_annotate_senses.pl: Talk with wsd_kyoto via temp files. Pipe
+	approach fails sometimes!
+
+2009-03-03  Aitor Soroa <a.soroa@gmail.com>
+
+	* kaf_annotate_senses.pl: Deal with terms spanning non-existent wf
+	elements
+
+2009-03-03  Aitor Soroa <a.soroa@gmail.com>
+
+	* kaf_annotate_senses.pl: output <sense> elements ordered by the
+	confidence, so that best sense appears first.
+
+2009-03-02  Aitor Soroa <a.soroa@gmail.com>
+
+	* kaf_annotate_senses.pl: Allow terms without lemma
+
+2009-02-27  Aitor Soroa <a.soroa@gmail.com>
+
+	* en/posmap_en.txt, eu/posmap_eu.txt, sp/posmap_sp.txt: Add pos
+	mappings
+
+2009-02-27  Aitor Soroa <a.soroa@gmail.com>
+
+	* Initial import
+
