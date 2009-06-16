@@ -14,7 +14,7 @@ my %opts;
 
 getopts('x:m:M:W:', \%opts);
 
-my $wsd_exec = $opts{'x'} ? $opts{'x'} : "./wsd_kyoto";
+my $wsd_exec = $opts{'x'} ? $opts{'x'} : "./ukb_wsd";
 my $kb_binfile = $opts{'M'};
 my $dict_file = $opts{'W'};
 
@@ -31,7 +31,7 @@ if (@ARGV && $ARGV[0] eq "--") {
   $wsd_extraopts = join(" ", @ARGV);
 }
 
-my $wsd_cmd = " $wsd_exec -M $kb_binfile -W $dict_file $wsd_extraopts";
+my $wsd_cmd = " $wsd_exec -K $kb_binfile -D $dict_file --allranks $wsd_extraopts";
 
 # default POS mapping for KAF
 
@@ -102,7 +102,11 @@ sub wsd {
 
   my $wsd_cmd = "$cmd $ftmp > $otmp 2> /dev/null";
 
-  system "$wsd_cmd";
+  eval {
+    system "$wsd_cmd";
+  };
+
+  $? and die "Error when executing wsd command:\n$wsd_cmd\n";
 
   open(my $fh, $otmp->filename) || die "Can't open $otmp->filename:$!\n";
 
