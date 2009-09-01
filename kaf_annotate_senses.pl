@@ -4,6 +4,7 @@ use strict;
 
 use XML::LibXML;
 use File::Temp;
+use File::Basename;
 use IPC::Open3;
 use IO::Select;
 use Symbol; # for gensym
@@ -23,6 +24,8 @@ my $fname = shift;
 &usage("Error: no dictionary") unless -f $dict_file;
 &usage("Error: no KB graph") unless -f $kb_binfile;
 &usage("Error: can't execute $wsd_exec") unless &try_wsd($wsd_exec);
+
+my $kb_resource = basename($kb_binfile, '.bin');
 
 my $wsd_extraopts;
 
@@ -70,15 +73,15 @@ while (my ($tid, $h) = each %Sense_map) {
   next unless scalar keys %{ $h };
   my ($term_elem) = $doc->findnodes("//term[\@tid='$tid']");
   die "Error: no term $tid.\n" unless $term_elem;
-  my $senseAlt_elem = $doc->createElement('senseAlt');
-
+  my $xrefs_elem = $doc->createElement('externalReferences');
   foreach my $sid (sort {$h->{$b} <=> $h->{$a}} keys %{ $h }) {
-    my $sense_elem = $doc->createElement('sense');
-    $sense_elem->setAttribute('sensecode', $sid);
-    $sense_elem->setAttribute('confidence', $h->{$sid} );
-    $senseAlt_elem->addChild($sense_elem);
+    my $xref_elem = $doc->createElement('externalRef');
+    $xref_elem->setAttribute('resource', $kb_resource);
+    $xref_elem->setAttribute('reference', $sid);
+    $xref_elem->setAttribute('confidence', $h->{$sid} );
+    $xrefs_elem->addChild($xref_elem);
   }
-  $term_elem->addChild($senseAlt_elem);
+  $term_elem->addChild($xrefs_elem);
 }
 
 print $doc->toString(1)."\n";
