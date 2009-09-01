@@ -23,9 +23,11 @@ my $fname = shift;
 
 &usage("Error: no dictionary") unless -f $dict_file;
 &usage("Error: no KB graph") unless -f $kb_binfile;
-&usage("Error: can't execute $wsd_exec") unless &try_wsd($wsd_exec);
 
 my $kb_resource = basename($kb_binfile, '.bin');
+
+my $UKB_VERSION = &try_wsd($wsd_exec);
+&usage("Error: can't execute $wsd_exec") unless $UKB_VERSION;
 
 my $wsd_extraopts;
 
@@ -83,6 +85,8 @@ while (my ($tid, $h) = each %Sense_map) {
   }
   $term_elem->addChild($xrefs_elem);
 }
+
+&add_lp_header($doc);
 
 print $doc->toString(1)."\n";
 
@@ -346,8 +350,51 @@ sub read_pos_map {
 sub try_wsd {
 
   my $cmd = shift;
-  `$cmd -h`;
-  return $? == 0;
+  my $v = qx($cmd --version);
+  my $ok = ($? == 0);
+  chomp $v;
+  return "" unless $ok;
+  return $v;
+}
+
+sub add_lp_header {
+
+  my $doc = shift;
+
+  # see if kafHeader exists and create if not
+
+  my ($hdr_elem) = $doc->findnodes("/KAF/kafHeader");
+  if (! defined($hdr_elem)) {
+    # create and insert as first child of KAF element
+    my ($kaf_elem) = $doc->findnodes("/KAF");
+    die "root <KAF> element not found!\n" unless defined $kaf_elem;
+    my ($fchild_elem) = $doc->findnodes("/KAF/*");
+    $hdr_elem = $doc->createElement('kafHeader');
+    $kaf_elem->insertBefore($hdr_elem, $fchild_elem);
+  }
+
+  # see if <linguisticProcessor layer="terms"> exists and create if not
+
+  my ($lingp_elem) = $hdr_elem->findnodes("//linguisticProcessors[layer='text']");
+  if(! defined($lingp_elem)) {
+    $lingp_elem = $doc->createElement('linguisticProcessors');
+    $lingp_elem->setAttribute('target', 'terms');
+    $hdr_elem->addChild($lingp_elem);
+  }
+
+  my $lp_elem = $doc->createElement('lp');
+  $lp_elem->setAttribute('name', 'ukb');
+  $lp_elem->setAttribute('version', $UKB_VERSION);
+  $lp_elem->setAttribute('timestamp', &get_datetime());
+  $lingp_elem->addChild($lp_elem);
+}
+
+
+sub get_datetime {
+
+my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+return sprintf "%4d-%02d-%02dT%02d:%02d:%02dZ", $year+1900,$mon+1,$mday,$hour,$min,$sec;
+
 }
 
 sub usage {
