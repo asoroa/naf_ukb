@@ -378,7 +378,7 @@ sub add_lp_header {
   my ($lingp_elem) = $hdr_elem->findnodes("//linguisticProcessors[layer='text']");
   if(! defined($lingp_elem)) {
     $lingp_elem = $doc->createElement('linguisticProcessors');
-    $lingp_elem->setAttribute('target', 'terms');
+    $lingp_elem->setAttribute('layer', 'terms');
     $hdr_elem->addChild($lingp_elem);
   }
 
