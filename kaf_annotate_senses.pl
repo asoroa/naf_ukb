@@ -283,6 +283,7 @@ sub getSentences {
   foreach my $term_elem ($root->findnodes('terms//term')) {
     my $lemma = $term_elem->getAttribute('lemma');
     next unless $lemma;
+    next if $lemma =~ /\#/;  # ukb does not like '#' characters in lemmas
     $lemma =~s/\s/_/go;	     # replace whitespaces with underscore (for mws)
     my $pos = $term_elem->getAttribute('pos');
     $pos = &tr_pos($pos_map, $pos);
