@@ -11,6 +11,8 @@ use Symbol; # for gensym
 
 use Getopt::Std;
 
+binmode(STDOUT, ":utf8");
+
 my %opts;
 
 getopts('x:m:M:W:', \%opts);
