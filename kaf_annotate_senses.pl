@@ -101,14 +101,8 @@ sub wsd {
   binmode ($ftmp, ':utf8');
 
   for(my $i=0; $i < scalar @{ $ctxRef }; $i++) {
-    my @ctx;
-    foreach my $ctx_word ( @{ $ctxRef->[$i] } ) {
-      next if $ctx_word =~ /\#/; # ukb does not like # characters
-      push @ctx, $ctx_word;
-    }
-    next unless @ctx;
     print $ftmp $idRef->[$i]."\n";
-    print $ftmp join(" ", @ctx)."\n";
+    print $ftmp join(" ", @{ $ctxRef->[$i] })."\n";
   }
   $ftmp->close();
 
