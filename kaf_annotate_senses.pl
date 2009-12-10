@@ -118,7 +118,7 @@ sub wsd {
   $? and die "Error when executing wsd command:\n$wsd_cmd\n";
 
   open(my $fh, $otmp->filename) || die "Can't open $otmp->filename:$!\n";
-
+  binmode ($fh, ':utf8');
   my %H;
   <$fh>; # skip first line
   while(my $inst = <$fh>) {
