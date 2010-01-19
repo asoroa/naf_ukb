@@ -1,3 +1,7 @@
+2010-01-19  Aitor Soroa <a.soroa@gmail.com>
+
+	* Deal with compound terms (components element)
+
 2010-01-18  Aitor Soroa <a.soroa@gmail.com>
 
 	* Add a script for converting LMF wordnets to UKB input graphs.
