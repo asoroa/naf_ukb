@@ -287,7 +287,7 @@ sub getSentences {
   foreach my $term_elem ($root->findnodes('terms//term')) {
 
     my $lemma = &filter_lemma($term_elem->getAttribute('lemma'));
-    return unless $lemma;
+    next unless $lemma;
     my $pos = $term_elem->getAttribute('pos');
     $pos = &tr_pos($pos_map, $pos);
     next unless $pos;
