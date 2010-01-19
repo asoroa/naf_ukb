@@ -76,7 +76,11 @@ my %Sense_map = &wsd($wsd_cmd, \@Ctxs, $idRef);	# { tid => { sense => score } }
 while (my ($tid, $h) = each %Sense_map) {
   next unless scalar keys %{ $h };
   my ($term_elem) = $doc->findnodes("//term[\@tid='$tid']");
-  die "Error: no term $tid.\n" unless $term_elem;
+  if (!defined($term_elem)) {
+    # See if compound
+    ($term_elem) = $doc->findnodes("//term/component[\@id='$tid']");
+  }
+  die "Error: no term/component with id $tid.\n" unless $term_elem;
   my $xrefs_elem = $doc->createElement('externalReferences');
   foreach my $sid (sort {$h->{$b} <=> $h->{$a}} keys %{ $h }) {
     my $xref_elem = $doc->createElement('externalRef');
@@ -278,28 +282,50 @@ sub getSentences {
     $w2sent{$wf_elem->getAttribute('wid')}= $sent_id;
   }
 
-  my %S;
+  my %S; # { sentence_id => [ "lemma#pos#tid", ... ] }
 
   foreach my $term_elem ($root->findnodes('terms//term')) {
-    my $lemma = $term_elem->getAttribute('lemma');
-    next unless $lemma;
-    next if $lemma =~ /\#/;  # ukb does not like '#' characters in lemmas
-    $lemma =~s/\s/_/go;	     # replace whitespaces with underscore (for mws)
+
+    my $lemma = &filter_lemma($term_elem->getAttribute('lemma'));
+    return unless $lemma;
     my $pos = $term_elem->getAttribute('pos');
     $pos = &tr_pos($pos_map, $pos);
     next unless $pos;
     my $tid = $term_elem->getAttribute('tid');
+
     my %sids;
     foreach my $target_elem ($term_elem->getElementsByTagName('target')) {
       my $wsid = $w2sent{$target_elem->getAttribute('id')};
       next unless defined $wsid;
       $sids{$wsid} = 1;
     }
+
     my @sent_ids= keys %sids;
     next unless @sent_ids;
     warn "Error: term $tid crosses sentence boundaries!\n" if @sent_ids > 1;
-    my ($sid) = shift @sent_ids;
+    my $sid = shift @sent_ids;
     push( @{ $S{$sid} }, "$lemma#$pos#$tid");
+
+    # treat components
+
+    foreach my $comp_elem ($term_elem->getElementsByTagName('component')) {
+      my $comp_id = $comp_elem->getAttribute('id');
+      my $comp_pos = $comp_elem->getAttribute('pos');
+      my $comp_lemma = &filter_lemma($comp_elem->getAttribute('lemma'));
+      next unless defined $comp_id;
+      next unless defined $comp_lemma;
+      if (defined ($comp_pos)) {
+	my $comp_pos_tr = &tr_pos($pos_map, $comp_pos);
+	next unless defined $comp_pos;
+	push( @{ $S{$sid} }, "$comp_lemma#$comp_pos_tr#$comp_id");
+      } else {
+	# no pos found in component. Try with all pos
+	my %saw;
+	foreach my $aux_pos (grep(!$saw{$_}++, values %{$pos_map}) ) {
+	  push( @{ $S{$sid} }, "$comp_lemma#$aux_pos#$comp_id");
+	}
+      }
+    }
   }
 
   my @IDS;
@@ -311,6 +337,17 @@ sub getSentences {
   }
 
   return (\@IDS, \@D);
+}
+
+
+sub filter_lemma {
+
+  my $lemma = shift;
+
+  return undef unless $lemma;
+  return undef if $lemma =~ /\#/;  # ukb does not like '#' characters in lemmas
+  $lemma =~s/\s/_/go;	     # replace whitespaces with underscore (for mws)
+  return $lemma;
 }
 
 sub w_count {
