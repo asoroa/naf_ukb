@@ -314,9 +314,9 @@ sub getSentences {
       my $comp_lemma = &filter_lemma($comp_elem->getAttribute('lemma'));
       next unless defined $comp_id;
       next unless defined $comp_lemma;
-      if (defined ($comp_pos)) {
+      if ($comp_pos) {
 	my $comp_pos_tr = &tr_pos($pos_map, $comp_pos);
-	next unless defined $comp_pos;
+	next unless $comp_pos_tr;
 	push( @{ $S{$sid} }, "$comp_lemma#$comp_pos_tr#$comp_id");
       } else {
 	# no pos found in component. Try with all pos
@@ -370,7 +370,7 @@ sub tr_pos {
   foreach my $posre (keys %{ $pos_map }) {
     return $pos_map->{$posre} if $pos =~ /$posre/i;
   }
-  return ""; # no match, return empty string
+  return undef; # no match
 }
 
 sub read_pos_map {
