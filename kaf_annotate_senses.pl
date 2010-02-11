@@ -11,8 +11,6 @@ use Symbol; # for gensym
 
 use Getopt::Std;
 
-binmode(STDOUT, ":utf8");
-
 my %opts;
 
 getopts('x:m:M:W:', \%opts);
@@ -52,6 +50,7 @@ my %pos_map = ("N.*" => 'n',
 
 my $parser = XML::LibXML->new();
 my $doc = $parser->parse_file($fname);
+$doc->setEncoding("UTF-8");
 my $root = $doc->getDocumentElement;
 
 my ($idRef, $docRef) = &getSentences($root, \%pos_map);
