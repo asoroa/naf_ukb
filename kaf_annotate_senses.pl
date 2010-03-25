@@ -40,11 +40,11 @@ my $wsd_cmd = " $wsd_exec -K $kb_binfile -D $dict_file --allranks $wsd_extraopts
 
 # default POS mapping for KAF
 
-my %pos_map = ("N.*" => 'n',
-	       "R.*" => 'n',
-	       "G.*" => 'a',
-	       "V.*" => 'v',
-	       "A.*" => 'r');
+my %pos_map = ("^N.*" => 'n',
+	       "^R.*" => 'n',
+	       "^G.*" => 'a',
+	       "^V.*" => 'v',
+	       "^A.*" => 'r');
 
 %pos_map = &read_pos_map( $opts{'m'} ) if $opts{'m'};
 
