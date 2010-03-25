@@ -84,6 +84,7 @@ sub fill_dict {
       print STDERR "No lemma in LexicalEntry $le_id\n";
       next;
     }
+    $lemma =~ s/\s+/_/g;
     my @Sense_elems = $le_elem->findnodes("./Sense");
     print STDERR "No senses in LexicalEntry $le_id\n" unless @Sense_elems;
     foreach my $sense_elem (@Sense_elems) {
