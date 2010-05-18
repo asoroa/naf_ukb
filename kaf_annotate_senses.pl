@@ -19,7 +19,13 @@ my $wsd_exec = $opts{'x'} ? $opts{'x'} : "./ukb_wsd";
 my $kb_binfile = $opts{'M'};
 my $dict_file = $opts{'W'};
 
-my $fname = shift;
+my $fname;
+
+if (!@ARGV || $ARGV[0] eq "--") {
+  $fname = "<-";
+} else {
+  $fname = shift;
+}
 
 &usage("Error: no dictionary") unless -f $dict_file;
 &usage("Error: no KB graph") unless -f $kb_binfile;
@@ -48,8 +54,10 @@ my %pos_map = ("^N.*" => 'n',
 
 %pos_map = &read_pos_map( $opts{'m'} ) if $opts{'m'};
 
+open(my $fh_fname, $fname);
+
 my $parser = XML::LibXML->new();
-my $doc = $parser->parse_file($fname);
+my $doc = $parser->parse_fh($fh_fname);
 $doc->setEncoding("UTF-8");
 my $root = $doc->getDocumentElement;
 
