@@ -9,6 +9,8 @@ use IPC::Open3;
 use IO::Select;
 use Symbol; # for gensym
 
+binmode STDOUT;
+
 use Getopt::Std;
 
 my %opts;
@@ -55,10 +57,11 @@ my %pos_map = ("^N.*" => 'n',
 %pos_map = &read_pos_map( $opts{'m'} ) if $opts{'m'};
 
 open(my $fh_fname, $fname);
+binmode $fh_fname;
 
 my $parser = XML::LibXML->new();
 my $doc = $parser->parse_fh($fh_fname);
-$doc->setEncoding("UTF-8");
+
 my $root = $doc->getDocumentElement;
 
 my ($idRef, $docRef) = &getSentences($root, \%pos_map);
@@ -101,7 +104,7 @@ while (my ($tid, $h) = each %Sense_map) {
 
 &add_lp_header($doc);
 
-print $doc->toString(1)."\n";
+$doc->toFH(\*STDOUT, 1)."\n";
 
 sub wsd {
 
@@ -126,7 +129,10 @@ sub wsd {
     system "$wsd_cmd";
   };
 
-  $? and die "Error when executing wsd command:\n$wsd_cmd\n";
+  if ($?) {
+    $ftmp->unlink_on_destroy(0);
+    die "Error when executing wsd command:\n$wsd_cmd\n";
+  }
 
   open(my $fh, $otmp->filename) || die "Can't open $otmp->filename:$!\n";
   binmode ($fh, ':utf8');
