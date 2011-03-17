@@ -101,7 +101,7 @@ while (my ($tid, $h) = each %Sense_map) {
 
 &add_lp_header($doc);
 
-$doc->toFH(\*STDOUT, 1)."\n";
+$doc->toFH(\*STDOUT, 1);
 
 sub wsd {
 
