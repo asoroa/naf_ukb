@@ -61,7 +61,7 @@ my $doc = $parser->parse_file($fname);
 
 my $root = $doc->getDocumentElement;
 
-my ($idRef, $docRef) = &getSentences($root, \%pos_map);
+my ($idRef, $docRef, $tid2telem) = &getSentences($root, \%pos_map);
 
 my @Ctxs;
 my $ctx_size = &w_count($docRef);
@@ -82,12 +82,7 @@ my %Sense_map = &wsd($wsd_cmd, \@Ctxs, $idRef);	# { tid => { sense => score } }
 
 while (my ($tid, $h) = each %Sense_map) {
   next unless scalar keys %{ $h };
-  my ($term_elem) = $doc->findnodes("//term[\@tid='$tid']");
-  if (!defined($term_elem)) {
-    # See if compound
-    ($term_elem) = $doc->findnodes("//term/component[\@id='$tid']");
-  }
-  die "Error: no term/component with id $tid.\n" unless $term_elem;
+  my $term_elem = $tid2telem->{$tid};
   my $xrefs_elem = $doc->createElement('externalReferences');
   foreach my $sid (sort {$h->{$b} <=> $h->{$a}} keys %{ $h }) {
     my $xref_elem = $doc->createElement('externalRef');
@@ -285,6 +280,8 @@ sub getSentences {
 
   my ($root, $pos_map) = @_;
 
+  my %tid2telem;
+
   my %w2sent;
   foreach my $wf_elem ($root->findnodes('text//wf')) {
     my $sent_id = $wf_elem->getAttribute('sent');
@@ -314,6 +311,7 @@ sub getSentences {
     next unless @sent_ids;
     warn "Error: term $tid crosses sentence boundaries!\n" if @sent_ids > 1;
     my $sid = shift @sent_ids;
+    $tid2telem{$tid} = $term_elem;
     push( @{ $S{$sid} }, "$lemma#$pos#$tid");
 
     # treat components
@@ -335,6 +333,7 @@ sub getSentences {
 	  push( @{ $S{$sid} }, "$comp_lemma#$aux_pos#$comp_id");
 	}
       }
+      $tid2telem{$comp_id} = $comp_elem;
     }
   }
 
@@ -346,7 +345,7 @@ sub getSentences {
     push @D, $S{$sid};
   }
 
-  return (\@IDS, \@D);
+  return (\@IDS, \@D, \%tid2telem);
 }
 
 
