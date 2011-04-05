@@ -56,8 +56,11 @@ my %pos_map = ("^N.*" => 'n',
 
 %pos_map = &read_pos_map( $opts{'m'} ) if $opts{'m'};
 
+open(my $fh_fname, $fname);
+binmode $fh_fname;
+
 my $parser = XML::LibXML->new();
-my $doc = $parser->parse_file($fname);
+my $doc = $parser->parse_fh($fh_fname);
 
 my $root = $doc->getDocumentElement;
 
