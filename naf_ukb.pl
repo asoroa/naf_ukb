@@ -468,6 +468,6 @@ sub usage {
 
 
   print $str."\n";
-  die "usage: $0 [-x wsd_executable] [-m pos_mapping_file ] -K kbfile.bin -D dict.txt kaf_input.txt [-- wsd_executable_options]\n";
+  die "usage: $0 [-x wsd_executable] [-m pos_mapping_file ] -K kbfile.bin -D dict.txt naf_input.txt [-- wsd_executable_options]\n";
 
 }

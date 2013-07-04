@@ -1,22 +1,20 @@
 
 
-Little script to add sense information to KAF input, thus producing new KAF.
+Little script to add sense information to NAF input, thus producing new NAF.
 
 Usage:
-./kaf_annotate_senses.pl [-x wsd_executable] [-m pos_mapping_file ] -M kbfile.bin -W dict.txt kaf_input.txt [-- wsd_executable_options]
+./naf_ukb.pl [-x wsd_executable] [-m pos_mapping_file ] -K kbfile.bin -D dict.txt naf_input.txt [-- wsd_executable_options]
 
 obligatory options:
 
--M knowledge base binary serialization
--W dictionary text file
+-K knowledge base binary serialization
+-D dictionary text file
 
 optional options:
 
--x path to wsd_kyoto executable. Default is './ukb_wsd'
+-x path to ukb_wsd executable. Default is './ukb_wsd'
 
--m mapping file for pos mapping. Until we decide a canonical way to
-   represent pos values, the script uses a mapping file. The file consists
-   on lines with 2 elements:
+-m mapping file for pos mapping. The file consists on lines with 2 elements:
 
 Regular_expression translation
 
@@ -49,14 +47,13 @@ Example:
 The following command annotates the spanish input KAF terms with senses,
 mapping the pos values accordingly:
 
-./kaf_annotate_senses.pl -M kb.bin -W spdict.txt in.kaf.xml > out.kaf.xml
-
+./naf_ukb.pl -K kb.bin -D spdict.txt in.kaf.xml > out.naf.xml
 
 If we want to reduce the number of iterations of PageRank, we can use the
 --prank_iter option of 'ukb_wsd' application:
 
-./kaf_annotate_senses.pl -M kb.bin -W spdict.txt in.kaf.xml -- --prank_iter 5 > out.kaf.xml
+./naf_ukb.pl -M kb.bin -W spdict.txt in.kaf.xml -- --prank_iter 5 > out.naf.xml
 
 Also, we can specify the path to the wsd executable:
 
-./kaf_annotate_senses.pl -x /opt/ukb/ukb_wsd -M kb.bin -W spdict.txt in.kaf.xml > out.kaf.xml
+./naf_ukb.pl -x /opt/ukb/ukb_wsd -M kb.bin -W spdict.txt in.kaf.xml > out.naf.xml
