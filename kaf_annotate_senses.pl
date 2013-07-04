@@ -15,11 +15,13 @@ use Getopt::Std;
 
 my %opts;
 
-getopts('x:m:M:W:', \%opts);
+getopts('x:m:M:W:D:K:', \%opts);
 
 my $wsd_exec = $opts{'x'} ? $opts{'x'} : "./ukb_wsd";
 my $kb_binfile = $opts{'M'};
+$kb_binfile = $opts{'K'} unless $kb_binfile;
 my $dict_file = $opts{'W'};
+$dict_file = $opts{'D'} unless $dict_file;
 
 my $fname;
 
@@ -415,13 +417,14 @@ sub add_lp_header {
 
   # see if kafHeader exists and create if not
 
-  my ($hdr_elem) = $doc->findnodes("/KAF/kafHeader");
+  my ($doc_elem_name, $hdr_elem) = &locate_hdr_elem($doc);
   if (! defined($hdr_elem)) {
     # create and insert as first child of KAF element
-    my ($kaf_elem) = $doc->findnodes("/KAF");
-    die "root <KAF> element not found!\n" unless defined $kaf_elem;
-    my ($fchild_elem) = $doc->findnodes("/KAF/*");
-    $hdr_elem = $doc->createElement('kafHeader');
+    my ($kaf_elem) = $doc->findnodes("/$doc_elem_name");
+    die "root <$doc_elem_name> element not found!\n" unless defined $kaf_elem;
+    my ($fchild_elem) = $doc->findnodes("/$doc_elem_name/*");
+    my $hdr_name = lc($doc_elem_name)."Header";
+    $hdr_elem = $doc->createElement($hdr_name);
     $kaf_elem->insertBefore($hdr_elem, $fchild_elem);
   }
 
@@ -441,6 +444,16 @@ sub add_lp_header {
   $lingp_elem->addChild($lp_elem);
 }
 
+# second level element, ending with "*Header"
+sub locate_hdr_elem {
+  my $doc = shift;
+  my $doc_elem = $doc->getDocumentElement;
+   foreach my $child_elem ($doc_elem->childNodes) {
+     next unless $child_elem->nodeType == XML::LibXML::XML_ELEMENT_NODE;
+     return ($doc_elem->nodeName, $child_elem) if $child_elem->nodeName =~ /Header$/;
+   }
+  return ($doc_elem->nodeName, undef);
+}
 
 sub get_datetime {
 
@@ -455,6 +468,6 @@ sub usage {
 
 
   print $str."\n";
-  die "usage: $0 [-x wsd_executable] [-m pos_mapping_file ] -M kbfile.bin -W dict.txt kaf_input.txt [-- wsd_executable_options]\n";
+  die "usage: $0 [-x wsd_executable] [-m pos_mapping_file ] -K kbfile.bin -D dict.txt kaf_input.txt [-- wsd_executable_options]\n";
 
 }
