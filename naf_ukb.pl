@@ -40,10 +40,12 @@ my $UKB_VERSION = &try_wsd($wsd_exec);
 &usage("Error: can't execute $wsd_exec") unless $UKB_VERSION;
 
 my $wsd_extraopts;
+my $opt_nopos = 0;
 
 if (@ARGV && $ARGV[0] eq "--") {
   shift @ARGV;
   $wsd_extraopts = join(" ", @ARGV);
+  $opt_nopos = ($wsd_extraopts =~ /--nopos/);
 }
 
 my $wsd_cmd = " $wsd_exec -K $kb_binfile -D $dict_file --allranks $wsd_extraopts";
@@ -70,6 +72,12 @@ eval {
 die $@ if $@;
 
 my $root = $doc->getDocumentElement;
+
+# $idRef -> array with sentence id's
+# $docRef -> docs
+# e.g.
+# $idRef->[0] -> id of first setence
+# $docRef->[0] firt sentence (["lemma#pos#tid", "lemma#pos#tid" ...])
 
 my ($idRef, $docRef, $tid2telem) = &getSentences($root, \%pos_map);
 
@@ -310,6 +318,7 @@ sub getSentences {
   foreach my $wf_elem ($root->findnodes('text//wf')) {
     my $sent_id = $wf_elem->getAttribute('sent');
     $sent_id ="fake_sent" unless $sent_id;
+    substr($sent_id, 0, 0) = "s" if $sent_id =~ /^\d/;
     $w2sent{&wid($wf_elem)}= $sent_id;
   }
 
@@ -321,7 +330,7 @@ sub getSentences {
     next unless $lemma;
     my $pos = $term_elem->getAttribute('pos');
     $pos = &tr_pos($pos_map, $pos);
-    next unless $pos;
+    next unless $pos or $opt_nopos;
     my $tid = &tid($term_elem);
 
     my %sids;
