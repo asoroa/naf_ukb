@@ -62,7 +62,12 @@ open(my $fh_fname, $fname);
 binmode $fh_fname;
 
 my $parser = XML::LibXML->new();
-my $doc = $parser->parse_fh($fh_fname);
+my $doc;
+
+eval {
+  $parser->parse_fh($fh_fname);
+};
+die $@ if $@;
 
 my $root = $doc->getDocumentElement;
 
@@ -281,6 +286,20 @@ sub create_ctxs_nosentence {
   return @res;
 }
 
+sub wid {
+  my $wf_elem = shift;
+  my $wid = $wf_elem->getAttribute('id');
+  return $wid if defined $wid;
+  return $wf_elem->getAttribute('wid');
+}
+
+sub tid {
+  my $term_elem = shift;
+  my $tid = $term_elem->getAttribute('id');
+  return $tid if defined $tid;
+  return $term_elem->getAttribute('tid');
+}
+
 sub getSentences {
 
   my ($root, $pos_map) = @_;
@@ -291,7 +310,7 @@ sub getSentences {
   foreach my $wf_elem ($root->findnodes('text//wf')) {
     my $sent_id = $wf_elem->getAttribute('sent');
     $sent_id ="fake_sent" unless $sent_id;
-    $w2sent{$wf_elem->getAttribute('wid')}= $sent_id;
+    $w2sent{&wid($wf_elem)}= $sent_id;
   }
 
   my %S; # { sentence_id => [ "lemma#pos#tid", ... ] }
@@ -303,7 +322,7 @@ sub getSentences {
     my $pos = $term_elem->getAttribute('pos');
     $pos = &tr_pos($pos_map, $pos);
     next unless $pos;
-    my $tid = $term_elem->getAttribute('tid');
+    my $tid = &tid($term_elem);
 
     my %sids;
     foreach my $target_elem ($term_elem->getElementsByTagName('target')) {
