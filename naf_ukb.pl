@@ -65,7 +65,7 @@ my $parser = XML::LibXML->new();
 my $doc;
 
 eval {
-  $parser->parse_fh($fh_fname);
+  $doc = $parser->parse_fh($fh_fname);
 };
 die $@ if $@;
 
