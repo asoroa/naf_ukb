@@ -73,6 +73,8 @@ die $@ if $@;
 
 my $root = $doc->getDocumentElement;
 
+my $beg_tstamp = &get_datetime();
+
 # $idRef -> array with sentence id's
 # $docRef -> docs
 # e.g.
@@ -112,7 +114,7 @@ while (my ($tid, $h) = each %Sense_map) {
   $term_elem->addChild($xrefs_elem);
 }
 
-&add_lp_header($doc);
+&add_lp_header($doc, $beg_tstamp, &get_datetime());
 
 $doc->toFH(\*STDOUT, 1);
 
@@ -441,7 +443,7 @@ sub try_wsd {
 
 sub add_lp_header {
 
-  my $doc = shift;
+  my ($doc, $beg_tstamp, $end_tstamp) = @_;
 
   # see if kafHeader exists and create if not
 
@@ -458,7 +460,7 @@ sub add_lp_header {
 
   # see if <linguisticProcessor layer="terms"> exists and create if not
 
-  my ($lingp_elem) = $hdr_elem->findnodes("//linguisticProcessors[layer='text']");
+  my ($lingp_elem) = $hdr_elem->findnodes('//linguisticProcessors[@layer="terms"]');
   if(! defined($lingp_elem)) {
     $lingp_elem = $doc->createElement('linguisticProcessors');
     $lingp_elem->setAttribute('layer', 'terms');
@@ -468,7 +470,8 @@ sub add_lp_header {
   my $lp_elem = $doc->createElement('lp');
   $lp_elem->setAttribute('name', 'ukb');
   $lp_elem->setAttribute('version', $UKB_VERSION);
-  $lp_elem->setAttribute('timestamp', &get_datetime());
+  $lp_elem->setAttribute('beginTimestamp', $beg_tstamp);
+  $lp_elem->setAttribute('endTimestamp', $end_tstamp);
   $lingp_elem->addChild($lp_elem);
 }
 
@@ -485,7 +488,7 @@ sub locate_hdr_elem {
 
 sub get_datetime {
 
-my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=gmtime(time);
 return sprintf "%4d-%02d-%02dT%02d:%02d:%02dZ", $year+1900,$mon+1,$mday,$hour,$min,$sec;
 
 }
