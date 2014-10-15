@@ -58,3 +58,9 @@ If we want to reduce the number of iterations of PageRank, we can use the
 Also, we can specify the path to the wsd executable:
 
 ./naf_ukb.pl -x /opt/ukb/ukb_wsd -M kb.bin -W spdict.txt in.kaf.xml > out.naf.xml
+
+Installing ukb_naf
+==================
+
+Please take a look to the INSTALL file for installing instructions.
+
