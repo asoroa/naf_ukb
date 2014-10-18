@@ -8,6 +8,7 @@ use File::Basename;
 use IPC::Open3;
 use IO::Select;
 use Symbol; # for gensym
+use Sys::Hostname;
 
 binmode STDOUT;
 
@@ -472,6 +473,7 @@ sub add_lp_header {
   $lp_elem->setAttribute('version', $UKB_VERSION);
   $lp_elem->setAttribute('beginTimestamp', $beg_tstamp);
   $lp_elem->setAttribute('endTimestamp', $end_tstamp);
+  $lp_elem->setAttribute('hostname', hostname);
   $lingp_elem->addChild($lp_elem);
 }
 
