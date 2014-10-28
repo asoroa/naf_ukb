@@ -4,12 +4,14 @@ steps:
 
 1) INSTALLING BOOST LIBRARIES
 
+Suppose we want to install the boost libraries in the local folder /usr/local
+
 $ mkdir /tmp/boost_src
 $ cd /tmp/boost_src
 $ wget http://downloads.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.tar.bz2
 $ tar xjf boost_1_54_0.tar.bz2
 $ cd boost_1_54_0
-$ ./bootstrap.sh --prefix=/home/newsreader/opt --with-libraries=graph,system,filesystem,program_options,regex
+$ ./bootstrap.sh --prefix=/usr/local --with-libraries=graph,system,filesystem,program_options,regex
 $ sudo ./b2 install --layout=system
 $ sudo ldconfig
 $ cd
@@ -17,12 +19,14 @@ $ rm -fr /tmp/boost_src
 
 2) INSTALLING UKB
 
+Suppose we want to locally install UKB in the directory /home/user/ukb_naf
+
 $ cd
-$ mkdir components/EHU-ukb
-$ cd components/EHU-ukb
+$ mkdir user/ukb_naf
+$ cd user/ukb_naf
 $ git clone https://github.com/asoroa/ukb.git
 $ cd ukb/src
-$ ./configure --with-boost-include=/usr/local/include --prefix=/home/newsreader/components/EHU-ukb/ukb
+$ ./configure --with-boost-include=/usr/local/include --prefix=/home/user/ukb_naf
 $ make
 $ make install
 
@@ -40,6 +44,11 @@ $ sudo apt-get install libxml-libxml-perl
 $ sudo yum install perl-XML-LibXML
 
 4) INSTALLING ukb_naf
+
+We will install ukb_naf in the directory /home/user/ukb_naf (where ukb is)
+
+$ cd
+$ cd ukb_naf
 $ git clone https://github.com/asoroa/naf_ukb.git
 
 5) CREATE GRAPH AND DICTIONARY
@@ -47,7 +56,7 @@ $ git clone https://github.com/asoroa/naf_ukb.git
 Use this commands to create the graph and dictionary that come with the UKB
 distribution.
 
-$ cd ~/components/EHU-ukb/ukb
+$ cd ~/ukb_naf/ukb
 $ bzcat ../../wn30_lkb/src/* | ./compile_kb -o ../../wn30_lkb/wn30g.bin64 -
 
 If you need another WordNet version, please look at the "scripts"
@@ -61,5 +70,5 @@ output NAF to STDOUT.
 #!/bin/bash
 
 # path were ukb and ukb_naf are
-rootDir=/home/newsreader/components/EHU-ukb 
+rootDir=/home/user/ukb_naf 
 ${rootDir}/naf_ukb/naf_ukb.pl -x ${rootDir}/ukb/bin/ukb_wsd -K ${rootDir}/wn30_lkb/wn30g.bin64 -D ${rootDir}/wn30_lkb/wn30.lex - -- --dict_weight --dgraph_dfs --dgraph_rank ppr
