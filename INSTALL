@@ -19,16 +19,17 @@ $ rm -fr /tmp/boost_src
 
 2) INSTALLING UKB
 
-Suppose we want to locally install UKB in the directory /home/user/ukb_naf
+Suppose we want to locally install UKB in the directory /home/user/ukb_wsd
 
-$ cd
-$ mkdir user/ukb_naf
-$ cd user/ukb_naf
+$ mkdir ~/user/ukb_wsd
+$ cd ~/user/ukb_wsd
 $ git clone https://github.com/asoroa/ukb.git
 $ cd ukb/src
-$ ./configure --with-boost-include=/usr/local/include --prefix=/home/user/ukb_naf
+$ ./configure --with-boost-include=/usr/local/include --prefix=/home/user/ukb_wsd
 $ make
 $ make install
+
+The ukb binaries should be insalled in /home/user/ukb_wsd/bin
 
 3) INSTALLING PERL MODULES
 
@@ -45,19 +46,27 @@ $ sudo yum install perl-XML-LibXML
 
 4) INSTALLING ukb_naf
 
-We will install ukb_naf in the directory /home/user/ukb_naf (where ukb is)
+We will install ukb_naf in the directory /home/user/ukb_wsd
 
-$ cd
-$ cd ukb_naf
+$ cd ~/user/ukb_wsd
 $ git clone https://github.com/asoroa/naf_ukb.git
 
 5) CREATE GRAPH AND DICTIONARY
 
 Use this commands to create the graph and dictionary that come with the UKB
-distribution.
+distribution. The file at 
 
-$ cd ~/ukb_naf/ukb
-$ bzcat ../../wn30_lkb/src/* | ./compile_kb -o ../../wn30_lkb/wn30g.bin64 -
+http://ixa2.si.ehu.es/ukb/lkb_sources.tar.bz2
+
+contains the relations for some versions of WordNet. For instance, the
+following commands create a graph based on the relations in WordNet 3.0 (plus
+gloss relations):
+
+$ cd ~/user/ukb_wsd
+$ wget http://ixa2.si.ehu.es/ukb/lkb_sources.tar.bz2
+$ tar xjf lkb_sources.tar.bz2
+$ cat lkb_sources/30/*_rels.txt | ./bin/compile_kb -o lkb_sources/wn30g.bin64 -
+$ mv lkb_sources/30/wnet30_dict.txt lkb_sources/wn30.lex
 
 If you need another WordNet version, please look at the "scripts"
 subdirectory in the UKB repository.
@@ -70,5 +79,5 @@ output NAF to STDOUT.
 #!/bin/bash
 
 # path were ukb and ukb_naf are
-rootDir=/home/user/ukb_naf 
-${rootDir}/naf_ukb/naf_ukb.pl -x ${rootDir}/ukb/bin/ukb_wsd -K ${rootDir}/wn30_lkb/wn30g.bin64 -D ${rootDir}/wn30_lkb/wn30.lex - -- --dict_weight --dgraph_dfs --dgraph_rank ppr
+rootDir=/home/user/ukb_wsd 
+${rootDir}/naf_ukb/naf_ukb.pl -x ${rootDir}/bin/ukb_wsd -K ${rootDir}/lkb_sources/wn30g.bin64 -D ${rootDir}/lkb_sources/wn30.lex - -- --dict_weight --dgraph_dfs --dgraph_rank ppr
