@@ -225,7 +225,7 @@ sub _init {
   while (<$fh>) {
     my ($entry, @S) = split(/\s+/,$_);
 	my $poss = &poss(\@S);
-    my ($firstword, @rwords) = split(/[_-]+/,$entry) ;
+    my ($firstword, @rwords) = split(/[_-]+/,lc($entry)) ;
     next unless $firstword;
 	#next unless @rwords;
     my $length = @rwords ;

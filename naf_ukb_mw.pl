@@ -19,6 +19,8 @@ binmode STDOUT;
 
 use Getopt::Std;
 
+my $MODULE_NAME = "ukb_mw";
+
 my %opts;
 
 getopts('x:m:M:W:D:K:', \%opts);
@@ -541,12 +543,12 @@ sub create_markables_layer {
 	my $naf_elem = $xmldoc->getDocumentElement;
 	my $id2mark = {};
 	my $markables_elem = $xmldoc->createElement("markables");
-	$markables_elem->setAttribute("source", "ukb_wsd_mw");
 	my $Sents = [];
 	foreach my $doc ( @{ $docRef } ) {
 		my $ctx = [];
 		foreach my $cw ( @{ $doc } ) {
 			my $mark_elem = $xmldoc->createElement("mark");
+			$mark_elem->setAttribute("source", "ukb_wsd_mw");
 			my $markid = $cw->{id};
 			$mark_elem->setAttribute("id", $markid);
 			$mark_elem->setAttribute("lemma", $cw->{lemma});
@@ -587,15 +589,15 @@ sub add_lp_header {
 
 	# see if <linguisticProcessor layer="terms"> exists and create if not
 
-	my ($lingp_elem) = $hdr_elem->findnodes('//linguisticProcessors[@layer="terms"]');
+	my ($lingp_elem) = $hdr_elem->findnodes('//linguisticProcessors[@layer="markables"]');
 	if (! defined($lingp_elem)) {
 		$lingp_elem = $doc->createElement('linguisticProcessors');
-		$lingp_elem->setAttribute('layer', 'terms');
+		$lingp_elem->setAttribute('layer', 'markables');
 		$hdr_elem->addChild($lingp_elem);
 	}
 
 	my $lp_elem = $doc->createElement('lp');
-	$lp_elem->setAttribute('name', 'ukb');
+	$lp_elem->setAttribute('name', $MODULE_NAME);
 	$lp_elem->setAttribute('version', $UKB_VERSION);
 	$lp_elem->setAttribute('beginTimestamp', $beg_tstamp);
 	$lp_elem->setAttribute('endTimestamp', $end_tstamp);
