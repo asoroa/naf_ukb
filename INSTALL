@@ -2,36 +2,30 @@
 This file explains how to install ukb and ukb_naf. You should follow these
 steps:
 
-1) INSTALLING BOOST LIBRARIES
+1) INSTALL UKB
 
-Suppose we want to install the boost libraries in the local folder /usr/local
+Follow the instructions in https://github.com/asoroa/ukb/blob/master/src/INSTALL to install ukb. Alternatively, you can use the pre-compiled binaries available at http://ixa2.si.ehu.es/ukb/
 
-$ mkdir /tmp/boost_src
-$ cd /tmp/boost_src
-$ wget http://downloads.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.tar.bz2
-$ tar xjf boost_1_54_0.tar.bz2
-$ cd boost_1_54_0
-$ ./bootstrap.sh --prefix=/usr/local --with-libraries=graph,system,filesystem,program_options,regex
-$ sudo ./b2 install --layout=system
-$ sudo ldconfig
-$ cd
-$ rm -fr /tmp/boost_src
+2) CREATE GRAPH AND DICTIONARY
 
-2) INSTALLING UKB
+You have full instructions to compile the graph in
+https://github.com/asoroa/ukb/blob/master/src/README (1.2 Compiling the KB).
 
-Suppose we want to locally install UKB in the directory /home/user/ukb_wsd
+For the impatient, here is a quick reciple using the file at 
 
-$ mkdir ~/user/ukb_wsd
+http://ixa2.si.ehu.es/ukb/lkb_sources.tar.bz2
+
+which contains the relations for some versions of WordNet. For instance, the
+following commands create a graph based on the relations in WordNet 3.0
+(plus gloss relations):
+
 $ cd ~/user/ukb_wsd
-$ git clone https://github.com/asoroa/ukb.git
-$ cd ukb/src
-$ ./configure --with-boost-include=/usr/local/include --prefix=/home/user/ukb_wsd
-$ make
-$ make install
+$ wget http://ixa2.si.ehu.es/ukb/lkb_sources.tar.bz2
+$ tar xjf lkb_sources.tar.bz2
+$ cat lkb_sources/30/*_rels.txt | ./bin/compile_kb -o lkb_sources/wn30g.bin64 -
+$ mv lkb_sources/30/wnet30_dict.txt lkb_sources/wn30.lex
 
-The ukb binaries should be insalled in /home/user/ukb_wsd/bin
-
-3) INSTALLING PERL MODULES
+3) INSTALL PERL MODULES
 
 ukb_naf needs the XML::LibXML module to properly work. There are some
 alternatives, depending on the distribution you are working on.
@@ -44,40 +38,10 @@ $ sudo apt-get install libxml-libxml-perl
 
 $ sudo yum install perl-XML-LibXML
 
-4) INSTALLING ukb_naf
+4) INSTALL ukb_naf
 
 We will install ukb_naf in the directory /home/user/ukb_wsd
 
 $ cd ~/user/ukb_wsd
 $ git clone https://github.com/asoroa/naf_ukb.git
 
-5) CREATE GRAPH AND DICTIONARY
-
-Use this commands to create the graph and dictionary that come with the UKB
-distribution. The file at 
-
-http://ixa2.si.ehu.es/ukb/lkb_sources.tar.bz2
-
-contains the relations for some versions of WordNet. For instance, the
-following commands create a graph based on the relations in WordNet 3.0 (plus
-gloss relations):
-
-$ cd ~/user/ukb_wsd
-$ wget http://ixa2.si.ehu.es/ukb/lkb_sources.tar.bz2
-$ tar xjf lkb_sources.tar.bz2
-$ cat lkb_sources/30/*_rels.txt | ./bin/compile_kb -o lkb_sources/wn30g.bin64 -
-$ mv lkb_sources/30/wnet30_dict.txt lkb_sources/wn30.lex
-
-If you need another WordNet version, please look at the "scripts"
-subdirectory in the UKB repository.
-
-6) run.sh script
-
-this script reads NAF documents from STDIN, executes UKB, and sends the
-output NAF to STDOUT.
-
-#!/bin/bash
-
-# path were ukb and ukb_naf are
-rootDir=/home/user/ukb_wsd 
-${rootDir}/naf_ukb/naf_ukb.pl -x ${rootDir}/bin/ukb_wsd -K ${rootDir}/lkb_sources/wn30g.bin64 -D ${rootDir}/lkb_sources/wn30.lex - -- --dict_weight --dgraph_dfs --dgraph_rank ppr

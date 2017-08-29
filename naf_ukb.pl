@@ -16,13 +16,15 @@ use Getopt::Std;
 
 my %opts;
 
-getopts('x:m:M:W:D:K:', \%opts);
+getopts('dx:m:M:W:D:K:', \%opts);
 
 my $wsd_exec = $opts{'x'} ? $opts{'x'} : "./ukb_wsd";
 my $kb_binfile = $opts{'M'};
 $kb_binfile = $opts{'K'} unless $kb_binfile;
 my $dict_file = $opts{'W'};
 $dict_file = $opts{'D'} unless $dict_file;
+
+my $opt_deb = $opts{'d'};
 
 my $fname;
 
@@ -125,6 +127,7 @@ sub wsd {
 
   my $ftmp = File::Temp->new();
   die "Can't create temporal file:$!\n" unless $ftmp;
+  $ftmp->unlink_on_destroy(0) if $opt_deb;
   binmode ($ftmp, ':utf8');
 
   for(my $i=0; $i < scalar @{ $ctxRef }; $i++) {
@@ -135,7 +138,7 @@ sub wsd {
 
   my $otmp = File::Temp->new();
   $otmp->close();
-
+  $otmp->unlink_on_destroy(0) if $opt_deb;
   my $wsd_cmd = "$cmd $ftmp > $otmp 2> /dev/null";
 
   eval {
@@ -501,6 +504,6 @@ sub usage {
 
 
   print $str."\n";
-  die "usage: $0 [-x wsd_executable] [-m pos_mapping_file ] -K kbfile.bin -D dict.txt naf_input.txt [-- wsd_executable_options]\n";
+  die "usage: $0 [-d] [-x wsd_executable] [-m pos_mapping_file ] -K kbfile.bin -D dict.txt naf_input.txt [-- wsd_executable_options]\n";
 
 }
