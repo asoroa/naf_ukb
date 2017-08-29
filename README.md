@@ -28,6 +28,7 @@ the `naf_ukb` script requires two options that specify the location of the
 graph and dictionary to be used:
 
 `- K` knowledge base binary serialization
+
 `- D` dictionary text file
 
 ## Optional parameters ##
@@ -36,7 +37,7 @@ graph and dictionary to be used:
 
 `- m` mapping file for pos mapping. The file consists on lines with 2 elements:
 
-Regular_expression translation
+### Regular_expression translation ###
 
    and the program translates the pos values matched by the regex with the
    corresponding value. For instance, this is the mapping file for spanish
@@ -86,11 +87,13 @@ which contains the relations for some versions of WordNet. For instance, the
 following commands create a graph based on the relations in WordNet 3.0
 (plus gloss relations):
 
+```bash
 $ cd ~/user/ukb_wsd
 $ wget http://ixa2.si.ehu.es/ukb/lkb_sources.tar.bz2
 $ tar xjf lkb_sources.tar.bz2
 $ cat lkb_sources/30/*_rels.txt | ./bin/compile_kb -o lkb_sources/wn30g.bin64 -
 $ mv lkb_sources/30/wnet30_dict.txt lkb_sources/wn30.lex
+```
 
 ## 3) INSTALL PERL MODULES ##
 
@@ -98,16 +101,20 @@ ukb_naf needs the XML::LibXML module to properly work. There are some
 alternatives, depending on the distribution you are working on.
 
 - debian/ubuntu
-
+```bash
 $ sudo apt-get install libxml-libxml-perl
+```
 
 - RedHat/CentOS
-
+```bash
 $ sudo yum install perl-XML-LibXML
+```
 
 ## 4) INSTALL ukb_naf ##
 
 We will install ukb_naf in the directory /home/user/ukb_wsd
 
+```bash
 $ cd ~/user/ukb_wsd
 $ git clone https://github.com/asoroa/naf_ukb.git
+```
